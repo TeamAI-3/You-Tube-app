@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>YouTube MiniApp</title>
+  <title>MiniTube</title>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="./styles.css" />
@@ -12,26 +12,31 @@
 <body>
   <div class="app">
 
-    <!-- TOP: Search pill -->
+    <!-- TOP SEARCH -->
     <header class="topbar">
       <div class="searchPill">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M10 4a6 6 0 1 1 0 12A6 6 0 0 1 10 4Zm0-2a8 8 0 1 0 4.9 14.3l4.4 4.4a1 1 0 0 0 1.4-1.4l-4.4-4.4A8 8 0 0 0 10 2Z"/>
         </svg>
-        <input id="searchInput" type="text" placeholder="Поиск видео…" />
+        <input id="searchInput" type="text" placeholder="Поиск по YouTube…" />
       </div>
     </header>
 
-    <!-- MAIN: pages -->
+    <!-- CONTENT -->
     <main class="content">
       <section class="page active" data-page="home">
-        <h2>Главная</h2>
-        <p>Тут будут основные видео.</p>
+
+        <div class="playerWrap" id="playerWrap" style="display:none;">
+          <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+
+        <div id="status" class="status"></div>
+        <div class="grid" id="list"></div>
       </section>
 
       <section class="page" data-page="settings">
         <h2>Настройки</h2>
-        <p>Тут сделаем выбор оформления (тема/размер/цвет).</p>
+        <p>Сюда потом добавим переключатели оформления.</p>
       </section>
 
       <section class="page" data-page="contacts">
@@ -40,7 +45,7 @@
       </section>
     </main>
 
-    <!-- BOTTOM: pill nav -->
+    <!-- BOTTOM NAV -->
     <nav class="bottomNav" aria-label="Нижнее меню">
       <button class="tab active" data-to="home" type="button">
         <span class="tabInner">
