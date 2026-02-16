@@ -2,10 +2,12 @@
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
-// ВАЖНО: тут твой backend на Render (оставляю как было)
-const API_BASE = "https://you-tube-app.onrender.com";
+// Если фронт открывается с домена Render (you-tube-app.onrender.com) — можно делать запросы относительными.
+// Если фронт где-то ещё (например, Vercel) — оставляем абсолютный Render-URL.
+const IS_RENDER = window.location.hostname.endsWith("onrender.com");
+const API_BASE = IS_RENDER ? "" : "https://you-tube-app.onrender.com";
 
-// Навигация (исправлено: ищем .tab, а не "tab")
+// Навигация
 const tabs = document.querySelectorAll(".tab");
 const pages = document.querySelectorAll(".page");
 
@@ -13,12 +15,9 @@ function goTo(pageName) {
   tabs.forEach(b => b.classList.toggle("active", b.dataset.to === pageName));
   pages.forEach(p => p.classList.toggle("active", p.dataset.page === pageName));
 }
+tabs.forEach(btn => btn.addEventListener("click", () => goTo(btn.dataset.to)));
 
-tabs.forEach((btn) => {
-  btn.addEventListener("click", () => goTo(btn.dataset.to));
-});
-
-// Элементы
+// Элементы UI
 const qEl = document.getElementById("searchInput");
 const list = document.getElementById("list");
 const statusEl = document.getElementById("status");
@@ -74,7 +73,6 @@ function openVideo(videoId) {
 
   if (tg?.BackButton) {
     tg.BackButton.show();
-    // чтобы не накапливались клики
     tg.BackButton.offClick?.(backHandler);
     tg.BackButton.onClick(backHandler);
   }
@@ -92,7 +90,7 @@ async function loadPopular() {
     setStatus("");
   } catch (e) {
     console.error(e);
-    setStatus("Ошибка популярного. Проверь бэкенд /popular и YT_API_KEY.");
+    setStatus("Ошибка популярного. Проверь /popular на бэкенде.");
   }
 }
 
@@ -108,18 +106,18 @@ async function doSearch(q) {
     setStatus((data.items && data.items.length) ? "" : "Ничего не найдено");
   } catch (e) {
     console.error(e);
-    setStatus("Ошибка поиска. Проверь бэкенд /search и API_BASE.");
+    setStatus("Ошибка поиска. Проверь /search на бэкенде.");
   }
 }
 
-// debounce, чтобы не спамить API каждую букву
+// debounce (чтобы не спамить API)
 let t = null;
 qEl?.addEventListener("input", () => {
   clearTimeout(t);
   t = setTimeout(() => {
     const q = qEl.value.trim();
     if (!q) return loadPopular();
-    if (q.length < 2) return; // 1 буква — не ищем
+    if (q.length < 2) return;
     doSearch(q);
   }, 350);
 });
