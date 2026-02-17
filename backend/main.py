@@ -11,15 +11,14 @@ load_dotenv()
 
 YT_API_KEY = os.getenv("YT_API_KEY", "").strip()
 
-allowed = os.getenv("ALLOWED_ORIGINS", "*")
-ALLOWED_ORIGINS = [o.strip() for o in allowed.split(",")] if allowed else ["*"]
-
 app = FastAPI()
 
+# ВАЖНО: для mini app и fetch делаем максимально простой CORS
+# cookies не используем -> allow_credentials=False
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if ALLOWED_ORIGINS == ["*"] else ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -49,7 +48,7 @@ def to_item(video_id: str, sn: Dict[str, Any]) -> Dict[str, Any]:
 
 @app.get("/")
 def root():
-    return {"ok": True, "endpoints": ["/ping", "/search?q=cat", "/popular?region=RU"]}
+    return {"ok": True, "endpoints": ["/ping", "/search?q=cat", "/popular?region=RU&max_results=3"]}
 
 
 @app.get("/ping")
@@ -135,7 +134,7 @@ async def popular(region: str = "RU", max_results: int = 12):
     items = []
 
     for it in payload.get("items", []):
-        vid = it.get("id")  # тут строка videoId
+        vid = it.get("id")
         sn = it.get("snippet") or {}
         if not vid:
             continue

@@ -1,11 +1,8 @@
-// Telegram init
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
-// Если фронт открывается с домена Render (you-tube-app.onrender.com) — можно делать запросы относительными.
-// Если фронт где-то ещё (например, Vercel) — оставляем абсолютный Render-URL.
-const IS_RENDER = window.location.hostname.endsWith("onrender.com");
-const API_BASE = IS_RENDER ? "" : "https://you-tube-app.onrender.com";
+// ТВОЙ бекенд на Render
+const API_BASE = "https://you-tube-app.onrender.com";
 
 // Навигация
 const tabs = document.querySelectorAll(".tab");
@@ -17,7 +14,7 @@ function goTo(pageName) {
 }
 tabs.forEach(btn => btn.addEventListener("click", () => goTo(btn.dataset.to)));
 
-// Элементы UI
+// Элементы
 const qEl = document.getElementById("searchInput");
 const list = document.getElementById("list");
 const statusEl = document.getElementById("status");
@@ -40,6 +37,17 @@ function esc(s) {
   return String(s || "").replace(/[&<>"']/g, m => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
   }[m]));
+}
+
+async function apiJson(url) {
+  const r = await fetch(url);
+  const text = await r.text();
+  if (!r.ok) throw new Error(`HTTP ${r.status}: ${text.slice(0, 200)}`);
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Bad JSON: ${text.slice(0, 200)}`);
+  }
 }
 
 function render(items) {
@@ -84,13 +92,12 @@ async function loadPopular() {
   setStatus("Загружаю популярное…");
 
   try {
-    const r = await fetch(`${API_BASE}/popular?region=RU&max_results=12`);
-    const data = await r.json();
+    const data = await apiJson(`${API_BASE}/popular?region=RU&max_results=12`);
     render(data.items || []);
     setStatus("");
   } catch (e) {
     console.error(e);
-    setStatus("Ошибка популярного. Проверь /popular на бэкенде.");
+    setStatus("Ошибка популярного: " + (e?.message || "unknown"));
   }
 }
 
@@ -100,17 +107,16 @@ async function doSearch(q) {
   setStatus("Ищу…");
 
   try {
-    const r = await fetch(`${API_BASE}/search?q=${encodeURIComponent(q)}&max_results=12`);
-    const data = await r.json();
+    const data = await apiJson(`${API_BASE}/search?q=${encodeURIComponent(q)}&max_results=12`);
     render(data.items || []);
     setStatus((data.items && data.items.length) ? "" : "Ничего не найдено");
   } catch (e) {
     console.error(e);
-    setStatus("Ошибка поиска. Проверь /search на бэкенде.");
+    setStatus("Ошибка поиска: " + (e?.message || "unknown"));
   }
 }
 
-// debounce (чтобы не спамить API)
+// debounce
 let t = null;
 qEl?.addEventListener("input", () => {
   clearTimeout(t);
@@ -130,5 +136,5 @@ qEl?.addEventListener("keydown", (e) => {
   }
 });
 
-// Старт: сразу показываем популярное
+// старт
 loadPopular();
