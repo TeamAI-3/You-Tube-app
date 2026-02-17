@@ -24,8 +24,9 @@
 
     <!-- CONTENT -->
     <main class="content">
-      <section class="page active" data-page="home">
 
+      <!-- HOME -->
+      <section class="page active" data-page="home">
         <div class="playerWrap" id="playerWrap" style="display:none;">
           <iframe id="player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
@@ -34,15 +35,66 @@
         <div class="grid" id="list"></div>
       </section>
 
+      <!-- SETTINGS -->
       <section class="page" data-page="settings">
         <h2>Настройки</h2>
-        <p>Сюда потом добавим переключатели оформления.</p>
+
+        <div class="settingsCard">
+          <div class="field">
+            <label>Регион популярных</label>
+            <select id="setRegion">
+              <option value="RU">RU (Россия)</option>
+              <option value="KZ">KZ (Казахстан)</option>
+              <option value="UA">UA (Украина)</option>
+              <option value="BY">BY (Беларусь)</option>
+              <option value="US">US (США)</option>
+              <option value="DE">DE (Германия)</option>
+              <option value="TR">TR (Турция)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Сколько видео показывать</label>
+            <input id="setMaxResults" type="number" min="5" max="25" step="1" />
+            <div class="hint">От 5 до 25</div>
+          </div>
+
+          <div class="field">
+            <label>Вид ленты</label>
+            <select id="setLayout">
+              <option value="list">Список (крупно)</option>
+              <option value="grid">Сетка (2 колонки)</option>
+            </select>
+          </div>
+
+          <div class="field toggleRow">
+            <label>Автовоспроизведение в плеере</label>
+            <input id="setAutoplay" type="checkbox" />
+          </div>
+
+          <div class="field">
+            <label>Акцентный цвет</label>
+            <select id="setAccent">
+              <option value="auto">Как в Telegram</option>
+              <option value="purple">Фиолетовый</option>
+              <option value="blue">Синий</option>
+              <option value="green">Зелёный</option>
+              <option value="red">Красный</option>
+            </select>
+          </div>
+
+          <button id="setReset" class="btn" type="button">Сбросить настройки</button>
+        </div>
       </section>
 
+      <!-- CONTACTS -->
       <section class="page" data-page="contacts">
         <h2>Контакты</h2>
-        <p>Обратная связь: <a href="#" id="contactLink">написать</a></p>
+        <p class="mutedText">Если что-то сломалось или есть предложения — пиши сюда:</p>
+        <p><a href="#" id="contactLink">Написать</a></p>
+        <p class="hint">Откроется Telegram-чат/профиль.</p>
       </section>
+
     </main>
 
     <!-- BOTTOM NAV -->
